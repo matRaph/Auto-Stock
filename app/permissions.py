@@ -7,7 +7,7 @@ class IsAdminUser(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_admin
+        return request.user and request.user.groups.filter(name="Administrador").exists()
 
 
 class IsRegularUser(permissions.BasePermission):
@@ -16,4 +16,4 @@ class IsRegularUser(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user and not request.user.is_admin
+        return request.user and request.user.groups.filter(name="Comum").exists()
