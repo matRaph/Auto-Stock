@@ -12,18 +12,43 @@ services:
     ports:
       - "5433:5432"
 
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   app:
     build: .
     command: >
-      sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py makemigrations &&
+            python manage.py migrate && 
+            python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/auto_stock
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  celery:
+    build: .
+    command: celery -A autostock worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+      - app
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/auto_stock
+      - CELERY_BROKER_URL=redis://redis:6379/0
 
 volumes:
   postgres_data:
+  redis_data:

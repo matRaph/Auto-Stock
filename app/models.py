@@ -13,7 +13,11 @@ class Part(models.Model):
     quantity = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
 
-    car_model = models.ManyToManyField("CarModel", related_name="parts")
+    car_model = models.ManyToManyField(
+        "CarModel",
+        related_name="parts",
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.part_number} - {self.name}"
