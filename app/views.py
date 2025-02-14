@@ -106,7 +106,7 @@ class RegisterView(viewsets.ModelViewSet):
 
 class ImportPartsFromCSVViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser]
-    permission_classes = [IsAdminUser]  # Somente administradores podem fazer upload
+    permission_classes = [IsAdminUser]
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -126,7 +126,6 @@ class ImportPartsFromCSVViewSet(viewsets.ViewSet):
 
         file_content = file.read()
 
-        # Chama a tarefa Celery para processar o CSV de forma assíncrona
         import_parts_from_csv.delay(file_content)
 
         return Response({"status": "Arquivo recebido e processamento iniciado"}, status=status.HTTP_202_ACCEPTED)
